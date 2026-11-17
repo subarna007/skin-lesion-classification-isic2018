@@ -6,6 +6,7 @@ app compares an uploaded image with these vectors to show its nearest
 neighbours. Output: app/gallery/index.npz and app/gallery/thumbs/*.jpg.
 """
 import argparse
+import glob
 import os
 
 import numpy as np
@@ -19,6 +20,18 @@ from data import build_transforms
 from splits import CLASSES
 
 
+def find_checkpoint(name, ckpt_dir):
+    """Look in the checkpoint folder, then in the usual Kaggle locations."""
+    filename = f"{name}.pth"
+    candidates = [os.path.join(ckpt_dir, filename), os.path.join("/kaggle/working", filename)]
+    candidates += sorted(glob.glob(os.path.join("/kaggle/input", "**", filename), recursive=True))
+    for path in candidates:
+        if os.path.isfile(path):
+            return path
+    raise SystemExit(f"Could not find {filename}. Looked in {ckpt_dir}/, /kaggle/working/ and /kaggle/input/. "
+                     "Pass its location with --ckpt, or train the model again with src/train.py.")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--name", default="convnext_balanced")
@@ -26,12 +39,15 @@ def main():
     ap.add_argument("--thumb", type=int, default=160)
     ap.add_argument("--results_dir", default="results")
     ap.add_argument("--ckpt_dir", default="checkpoints")
+    ap.add_argument("--ckpt", default=None, help="explicit path to the .pth file")
     ap.add_argument("--out_dir", default="app/gallery")
     ap.add_argument("--seed", type=int, default=42)
     args = ap.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    ckpt = torch.load(os.path.join(args.ckpt_dir, f"{args.name}.pth"), map_location=device)
+    ckpt_path = args.ckpt or find_checkpoint(args.name, args.ckpt_dir)
+    print("using checkpoint", ckpt_path)
+    ckpt = torch.load(ckpt_path, map_location=device)
     model = timm.create_model(ckpt["arch"], pretrained=False, num_classes=len(CLASSES))
     model.load_state_dict(ckpt["state_dict"])
     model.to(device).eval()
