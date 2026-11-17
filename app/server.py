@@ -40,8 +40,34 @@ app.mount("/results", StaticFiles(directory=RESULTS_DIR, check_dir=False), name=
 app.mount("/gallery", StaticFiles(directory=GALLERY, check_dir=False), name="gallery")
 
 # ---------------------------------------------------------------- model + data
+def ensure_checkpoint(path):
+    """GitHub limits files to 100 MB, so the checkpoint is stored as two parts.
+    Join them into the original file on first start and check its SHA-256."""
+    path = Path(path)
+    if path.exists():
+        return
+    parts = sorted(path.parent.glob(path.name + ".part*"))
+    if not parts:
+        return
+    import hashlib
+    print(f"Joining {len(parts)} checkpoint parts into {path} (first start only)...")
+    digest = hashlib.sha256()
+    tmp = path.with_suffix(".tmp")
+    with open(tmp, "wb") as out:
+        for part in parts:
+            data = part.read_bytes()
+            digest.update(data)
+            out.write(data)
+    expected_file = path.parent / (path.name + ".sha256")
+    if expected_file.exists() and expected_file.read_text().split()[0] != digest.hexdigest():
+        tmp.unlink()
+        raise RuntimeError("Checkpoint parts are incomplete or corrupted; download the repository again.")
+    tmp.replace(path)
+
+
 classifier, load_error = None, None
 try:
+    ensure_checkpoint(CKPT)
     from .model import Classifier
     classifier = Classifier(CKPT)
 except Exception as exc:                                    # noqa: BLE001

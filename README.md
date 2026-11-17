@@ -79,20 +79,20 @@ Cases and bookings are stored in `app/data/` on the machine running the app. The
 
 ### Running it
 
+The trained ConvNeXt checkpoint is included in `checkpoints/`. GitHub limits files to 100 MB, so it is stored as two parts; the server joins them into `convnext_balanced.pth` on the first start and checks the SHA-256. The similar-case gallery (723 training images) is included in `app/gallery/`.
+
 1. Install the requirements (Python 3.10 or newer):
    ```bash
    python -m venv venv
    venv\Scripts\activate          # Windows; on macOS/Linux: source venv/bin/activate
    pip install -r app/requirements.txt
    ```
-2. Put the trained checkpoint at `checkpoints/convnext_balanced.pth`.
-3. Optional: put the similar-case gallery in `app/gallery/` (built by `src/build_gallery.py`).
-4. Start the server from the repository root and open http://localhost:8000:
+2. Start the server from the repository root and open http://localhost:8000:
    ```bash
    uvicorn app.server:app --port 8000
    ```
 
-Without a checkpoint the Research, Hospital and Appointments pages still work, and the Analyse page explains that the model is not loaded.
+The model runs on the CPU if there is no GPU; one analysis then takes a few seconds.
 
 ## Layout
 

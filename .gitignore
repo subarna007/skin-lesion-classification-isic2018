@@ -2,8 +2,11 @@ __pycache__/
 *.pyc
 .ipynb_checkpoints/
 data/
-checkpoints/
 *.pth
 *.npz
-.DS_Store
+!app/gallery/index.npz
+checkpoints/*
+!checkpoints/*.part*
+!checkpoints/*.sha256
 app/data/
+.DS_Store
