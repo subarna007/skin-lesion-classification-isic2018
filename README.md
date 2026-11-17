@@ -1,4 +1,4 @@
-# Skin lesion classification on ISIC 2018 (Task 3)
+# Skin lesion classification on ISIC 2018
 
 Seven-class classification of dermoscopic images (melanoma, nevus, basal cell carcinoma, actinic keratosis, benign keratosis, dermatofibroma, vascular lesion) on the ISIC 2018 Task 3 / HAM10000 dataset.
 
