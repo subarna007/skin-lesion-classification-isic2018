@@ -4,6 +4,10 @@ HAM10000 contains several images of the same lesion. A random image-level split
 puts near-duplicates of one lesion in both train and test and inflates the
 score, so the split is grouped by lesion id whenever the groupings file exists.
 
+Data source: the HAM10000 metadata file (same images as ISIC 2018 Task 3, with
+lesion ids) is used when present, e.g. as a Kaggle dataset input; otherwise the
+ISIC challenge files downloaded by download_data.py.
+
 Protocol A (preferred): official 1,512-image test set as the test set;
     the 10,015 training images are split ~85/15 into train/val by lesion.
 Protocol B (fallback, when the official test labels are not available):
@@ -19,9 +23,43 @@ CLASSES = ["MEL", "NV", "BCC", "AKIEC", "BKL", "DF", "VASC"]
 MALIGNANT = ["MEL", "BCC", "AKIEC"]          # AKIEC is treated as (pre-)malignant
 
 
+KAGGLE_INPUT = "/kaggle/input"
+
+
+def _roots(data_dir):
+    return [r for r in (data_dir, KAGGLE_INPUT) if os.path.isdir(r)]
+
+
 def _find(data_dir, pattern):
-    hits = sorted(glob.glob(os.path.join(data_dir, "**", pattern), recursive=True))
-    return hits[0] if hits else None
+    for root in _roots(data_dir):
+        hits = sorted(glob.glob(os.path.join(root, "**", pattern), recursive=True))
+        if hits:
+            return hits[0]
+    return None
+
+
+def _image_index(folder_roots):
+    """Map image id (file stem) -> path for every .jpg under the given roots."""
+    index = {}
+    for root in folder_roots:
+        for path in glob.glob(os.path.join(root, "**", "*.jpg"), recursive=True):
+            index.setdefault(os.path.splitext(os.path.basename(path))[0], path)
+    return index
+
+
+def _read_ham10000(meta_csv):
+    """HAM10000 metadata (same 10,015 images as ISIC 2018 Task 3, with lesion ids)."""
+    meta = pd.read_csv(meta_csv).drop_duplicates("image_id")
+    index = _image_index([os.path.dirname(meta_csv)])
+    meta["path"] = meta["image_id"].map(index)
+    missing = meta["path"].isna().sum()
+    if missing:
+        print(f"warning: {missing} images listed in the metadata were not found and are skipped")
+    meta = meta.dropna(subset=["path"])
+    meta["label"] = meta["dx"].str.upper().map({c: i for i, c in enumerate(CLASSES)})
+    meta = meta.dropna(subset=["label"])
+    meta["label"] = meta["label"].astype(int)
+    return meta.rename(columns={"image_id": "image"})[["image", "path", "label", "lesion_id"]]
 
 
 def _read_ground_truth(csv_path, image_dir):
@@ -32,14 +70,23 @@ def _read_ground_truth(csv_path, image_dir):
 
 
 def build_splits(data_dir="data", seed=42):
+    ham_csv = _find(data_dir, "HAM10000_metadata.csv")
     train_csv = _find(data_dir, "ISIC2018_Task3_Training_GroundTruth.csv")
-    if train_csv is None:
-        raise FileNotFoundError("Training ground truth not found; run download_data.py first")
-    train_dir = os.path.join(data_dir, "ISIC2018_Task3_Training_Input")
-    df = _read_ground_truth(train_csv, train_dir)
+    if ham_csv:
+        df = _read_ham10000(ham_csv)
+        grouping = "lesion"
+    elif train_csv:
+        df = _read_ground_truth(train_csv, os.path.join(os.path.dirname(os.path.dirname(train_csv)),
+                                                        "ISIC2018_Task3_Training_Input"))
+        grouping = None
+    else:
+        raise FileNotFoundError("No dataset found. Add the HAM10000 dataset as notebook input "
+                                "or run download_data.py.")
 
-    groups_csv = _find(data_dir, "ISIC2018_Task3_Training_LesionGroupings.csv")
-    if groups_csv:
+    groups_csv = None if grouping else _find(data_dir, "ISIC2018_Task3_Training_LesionGroupings.csv")
+    if grouping:
+        pass
+    elif groups_csv:
         g = pd.read_csv(groups_csv)
         lesion_col = next(c for c in g.columns if "lesion" in c.lower())
         df = df.merge(g[["image", lesion_col]].rename(columns={lesion_col: "lesion_id"}),
@@ -51,7 +98,8 @@ def build_splits(data_dir="data", seed=42):
         grouping = "image"
 
     test_csv = _find(data_dir, "ISIC2018_Task3_Test_GroundTruth.csv")
-    test_dir = os.path.join(data_dir, "ISIC2018_Task3_Test_Input")
+    test_dir = os.path.join(os.path.dirname(os.path.dirname(test_csv)),
+                            "ISIC2018_Task3_Test_Input") if test_csv else None
     official_test = bool(test_csv) and os.path.isdir(test_dir)
 
     n_folds = 7 if official_test else 20

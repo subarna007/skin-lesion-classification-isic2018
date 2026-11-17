@@ -27,7 +27,7 @@ pip install -r requirements.txt
 bash run_all.sh
 ```
 
-`run_all.sh` downloads the data from the ISIC challenge bucket, builds the split, trains both models, evaluates them and writes everything to `results/`. `notebooks/experiments.ipynb` runs the same steps.
+`run_all.sh` uses the HAM10000 dataset if it is already available (on Kaggle: the *Skin Cancer MNIST: HAM10000* dataset as input), otherwise downloads it from the ISIC challenge bucket; it then builds the split, trains both models, evaluates them and writes everything to `results/`. `notebooks/experiments.ipynb` runs the same steps.
 
 ## Layout
 
@@ -43,7 +43,7 @@ src/gradcam.py         class-specific Grad-CAM grid
 
 ## Data
 
-ISIC 2018 Task 3 (Codella et al., 2019; Tschandl et al., 2018). The images are not included in this repository.
+ISIC 2018 Task 3 training set, which is the HAM10000 dataset: 10,015 dermoscopic images with lesion ids (Codella et al., 2019; Tschandl et al., 2018). The images are not included in this repository.
 
 - N. Codella et al. "Skin Lesion Analysis Toward Melanoma Detection 2018: A Challenge Hosted by the International Skin Imaging Collaboration (ISIC)." arXiv:1902.03368, 2019.
 - P. Tschandl, C. Rosendahl, H. Kittler. "The HAM10000 dataset, a large collection of multi-source dermatoscopic images of common pigmented skin lesions." Scientific Data 5, 180161, 2018.
