@@ -1,0 +1,10 @@
+fastapi>=0.110
+uvicorn
+python-multipart
+torch>=2.1
+torchvision
+timm>=0.9
+grad-cam
+opencv-python-headless
+pillow
+numpy

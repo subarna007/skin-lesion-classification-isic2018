@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DermAssist · skin lesion triage prototype</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="logo">D</span> DermAssist</div>
+  <nav>
+    <a href="#analyse">Analyse</a>
+    <a href="#workflow">Hospital workflow</a>
+    <a href="#model">About the model</a>
+  </nav>
+  <span class="badge">Research prototype · not a medical device</span>
+</header>
+
+<main>
+<section class="hero">
+  <h1>AI-assisted triage of dermoscopic images</h1>
+  <p>Upload a dermoscopic image of a skin lesion. The model estimates the probability of seven
+     diagnoses from the ISIC 2018 challenge, shows where it looked, and suggests whether the case
+     should be referred to a dermatologist. It supports, and never replaces, clinical judgement.</p>
+  <div id="model-status" class="status">Checking model…</div>
+</section>
+
+<section id="analyse" class="card">
+  <h2>1 · Analyse an image</h2>
+  <div class="upload-row">
+    <label id="drop" class="drop">
+      <input id="file" type="file" accept="image/*" hidden>
+      <img id="preview" alt="" hidden>
+      <span id="drop-text">Drop a dermoscopic image here or <u>choose a file</u><br>
+        <small>JPEG or PNG, up to 15 MB</small></span>
+    </label>
+    <div class="upload-side">
+      <p class="hint">The model was trained only on dermoscopic images (taken through a dermatoscope).
+        Ordinary phone photos, other body parts or non-skin images will still produce an answer,
+        and that answer is meaningless.</p>
+      <button id="analyse-btn" disabled>Analyse image</button>
+      <div id="error" class="error" hidden></div>
+    </div>
+  </div>
+</section>
+
+<section id="result" class="card" hidden>
+  <h2>2 · Result</h2>
+  <div id="triage" class="triage"></div>
+  <div class="result-grid">
+    <div>
+      <div class="tabs">
+        <button class="tab active" data-img="gradcam">Grad-CAM</button>
+        <button class="tab" data-img="original">Original</button>
+        <button class="tab" data-img="outline">Lesion outline</button>
+      </div>
+      <img id="result-img" class="result-img" alt="analysed lesion">
+      <p class="caption" id="img-caption"></p>
+    </div>
+    <div>
+      <div class="prediction">
+        <div class="pred-label">Most likely</div>
+        <div class="pred-name" id="pred-name"></div>
+        <div><span id="pred-cat" class="pill"></span> <span id="pred-prob" class="muted"></span></div>
+        <p id="pred-desc" class="muted"></p>
+      </div>
+      <h3>Probability of each class</h3>
+      <div id="bars" class="bars"></div>
+      <h3>Melanoma screening</h3>
+      <p id="mel-text"></p>
+      <div id="warnings"></div>
+    </div>
+  </div>
+  <details class="descriptors">
+    <summary>Lesion shape and colour (experimental image measurements)</summary>
+    <div id="desc-body"></div>
+    <p class="muted small">Measured with classical image processing on the outlined region. These are not
+      part of the model's decision and are not clinically validated. Diameter and evolution (the D and E
+      of the ABCDE rule) are not shown: a single photo has no physical scale and no history.</p>
+  </details>
+  <div class="actions">
+    <button id="queue-btn">Add to referral queue</button>
+    <span class="muted small">Demonstrates the hospital workflow below. Stored only in this browser tab.</span>
+  </div>
+</section>
+
+<section id="workflow" class="card">
+  <h2>3 · Example hospital workflow</h2>
+  <p class="muted">Illustrative integration at a fictional facility, <b>Himalaya District Hospital</b>,
+    where a dermatologist visits only part of the week. Not a real deployment.</p>
+  <ol class="steps">
+    <li><b>Capture.</b> A health assistant takes a dermoscopic image at the outpatient clinic.</li>
+    <li><b>Triage.</b> DermAssist returns class probabilities, a Grad-CAM map and a refer / routine suggestion.</li>
+    <li><b>Queue.</b> Referred cases are listed for the visiting dermatologist, highest melanoma probability first.</li>
+    <li><b>Review.</b> The dermatologist examines the patient and decides on biopsy or follow-up. The AI output is advisory only.</li>
+  </ol>
+  <h3>Dermatologist review queue</h3>
+  <table class="queue">
+    <thead><tr><th>Case</th><th>Time</th><th>Most likely</th><th>P(melanoma)</th><th>Suggestion</th><th></th></tr></thead>
+    <tbody id="queue-body"><tr class="empty"><td colspan="6">No cases yet. Analyse an image and add it to the queue.</td></tr></tbody>
+  </table>
+</section>
+
+<section id="model" class="card">
+  <h2>4 · About the model</h2>
+  <div id="model-body" class="muted">Loading…</div>
+  <h3>Limitations</h3>
+  <ul class="limits">
+    <li>Trained and tested on one public dataset (HAM10000 / ISIC 2018), mostly from European clinics and lighter skin types. Performance on patients in Nepal is unknown.</li>
+    <li>Test results come from a held-out split of the same dataset, not from a prospective clinical study.</li>
+    <li>Rare classes (dermatofibroma, vascular lesions) have few test images, so their figures are uncertain.</li>
+    <li>Grad-CAM shows which regions influenced the output; it does not prove the reasoning is clinically correct.</li>
+  </ul>
+</section>
+</main>
+
+<footer>
+  DermAssist is a student research prototype for demonstration. It is not a medical device and must not be used
+  for diagnosis. Data: ISIC 2018 Task 3 / HAM10000 (Codella et al., 2019; Tschandl et al., 2018).
+</footer>
+<script src="/static/app.js"></script>
+</body>
+</html>

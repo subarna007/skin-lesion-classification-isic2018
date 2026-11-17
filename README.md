@@ -29,6 +29,25 @@ bash run_all.sh
 
 `run_all.sh` uses the HAM10000 dataset if it is already available (on Kaggle: the *Skin Cancer MNIST: HAM10000* dataset as input), otherwise downloads it from the ISIC challenge bucket; it then builds the split, trains both models, evaluates them and writes everything to `results/`. `notebooks/experiments.ipynb` runs the same steps.
 
+## Web demo (DermAssist)
+
+`app/` contains a small FastAPI web application that wraps the trained model as a triage prototype:
+
+- upload a dermoscopic image and get the probability of all seven classes,
+- class-specific Grad-CAM, the original image and the automatic lesion outline,
+- a refer / routine suggestion (refer when a malignant class is most likely or P(melanoma) is above the validation-tuned threshold),
+- experimental asymmetry, border and colour measurements (diameter and evolution are not estimated from a single photo),
+- an example workflow at a fictional district hospital with a dermatologist review queue,
+- the model's test metrics with confidence intervals and its limitations.
+
+```bash
+pip install -r app/requirements.txt
+# expects checkpoints/convnext_balanced.pth and results/convnext_balanced.json
+uvicorn app.server:app --port 8000
+```
+
+Then open http://localhost:8000.
+
 ## Layout
 
 ```
@@ -39,6 +58,7 @@ src/train.py           training (timm models, AMP, cosine schedule)
 src/evaluate.py        metrics, bootstrap CIs, melanoma operating point
 src/make_report.py     results table and per-class figure
 src/gradcam.py         class-specific Grad-CAM grid
+app/                   DermAssist web demo (FastAPI + HTML/JS)
 ```
 
 ## Data
