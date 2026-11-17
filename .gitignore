@@ -6,3 +6,4 @@ checkpoints/
 *.pth
 *.npz
 .DS_Store
+app/data/

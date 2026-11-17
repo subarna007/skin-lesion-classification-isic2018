@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Appointments · DermAssist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/site.css">
+</head>
+<body>
+<main>
+  <div class="page-head">
+    <h1>Book a dermatology appointment</h1>
+    <p class="lede">Reserve a slot with the visiting consultant dermatologist at Himalaya District Hospital.
+      If you came from an analysis, the case is attached so the dermatologist sees it in advance.</p>
+    <p class="fiction-note">Demonstration only. The hospital is fictional and no real appointment is made.
+      Bookings are stored on the computer running DermAssist.</p>
+  </div>
+
+  <div class="book">
+    <div class="panel">
+      <form id="book-form" novalidate>
+        <div id="linked" class="field" hidden></div>
+        <div class="row-3">
+          <div class="field"><label for="f-name">Patient name</label><input type="text" id="f-name" autocomplete="off" required minlength="2" maxlength="80"></div>
+          <div class="field"><label for="f-age">Age</label><input type="number" id="f-age" min="0" max="120" required></div>
+          <div class="field"><label for="f-sex">Sex</label>
+            <select id="f-sex" required><option value="">Select</option><option value="female">Female</option><option value="male">Male</option><option value="other">Other</option></select></div>
+        </div>
+        <div class="field"><label for="f-phone">Phone (optional)</label><input type="tel" id="f-phone" maxlength="30" style="max-width:280px"></div>
+        <div class="field"><span class="field-label" id="date-label">Date</span><div class="chips" id="dates" role="group" aria-labelledby="date-label"></div></div>
+        <div class="field"><span class="field-label" id="slot-label">Time</span><div class="chips" id="slots" role="group" aria-labelledby="slot-label"><span class="fine">Choose a date first.</span></div></div>
+        <div class="field"><label for="f-notes">Notes for the dermatologist (optional)</label><textarea id="f-notes" maxlength="500"></textarea></div>
+        <div id="form-error" class="alert error" role="alert" hidden style="margin-bottom:16px"></div>
+        <button class="btn primary" type="submit" id="book-btn">Book appointment</button>
+      </form>
+      <div id="confirm" class="confirm" hidden></div>
+    </div>
+
+    <div>
+      <h2 style="font-size:24px;margin-bottom:6px">Booked appointments</h2>
+      <p class="fine">Upcoming visits at the dermatology clinic.</p>
+      <div id="booked"></div>
+    </div>
+  </div>
+</main>
+<script src="/static/js/common.js"></script>
+<script src="/static/js/appointments.js"></script>
+</body>
+</html>

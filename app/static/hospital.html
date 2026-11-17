@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Himalaya District Hospital · DermAssist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/site.css">
+</head>
+<body>
+<main>
+  <div class="page-head">
+    <h1 id="h-name">Himalaya District Hospital</h1>
+    <p class="lede">How DermAssist could support a 100-bed district hospital in the hills of Nepal, where skin
+      complaints are common but a dermatologist visits only two days a week.</p>
+    <p class="fiction-note" id="h-note">Fictional hospital used to demonstrate the workflow. It is not a real deployment.</p>
+  </div>
+
+  <section class="band" style="padding-top:24px">
+    <h2>The referral pathway</h2>
+    <p>DermAssist sits between the first examination and the specialist, so the dermatologist's limited time goes to
+      the lesions most likely to be malignant.</p>
+    <ol class="flow">
+      <li><h3>Capture</h3><p>A health assistant examines the patient and takes a dermoscopic image at the outpatient clinic.</p></li>
+      <li><h3>Triage</h3><p>DermAssist returns class probabilities, Grad-CAM and a refer or routine suggestion within seconds.</p></li>
+      <li><h3>Queue and book</h3><p>Referred cases join the review queue and can be booked into the next visiting clinic.</p></li>
+      <li><h3>Specialist review</h3><p>The dermatologist examines the patient and decides on biopsy, treatment or follow-up.</p></li>
+    </ol>
+  </section>
+
+  <section class="band">
+    <div class="two-col">
+      <div>
+        <h2 style="margin-bottom:8px">Dermatology services</h2>
+        <div class="services" id="services" style="grid-template-columns:1fr"></div>
+      </div>
+      <div>
+        <h2 style="margin-bottom:8px">Who is available when</h2>
+        <p class="muted">Appointments with the consultant are bookable on visiting days only.</p>
+        <table class="data" id="schedule" style="margin-top:14px"></table>
+      </div>
+    </div>
+  </section>
+
+  <section class="band" id="queue">
+    <div style="display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap">
+      <div>
+        <h2>Dermatologist review queue</h2>
+        <p class="muted" style="margin:6px 0 0">Every analysed case, referrals first and then by melanoma probability.
+          Mark a case as reviewed once the dermatologist has seen it.</p>
+      </div>
+      <a class="btn primary" href="/analyse">Analyse a new image</a>
+    </div>
+    <div style="overflow-x:auto;margin-top:22px"><table class="data" id="queue-table"></table></div>
+  </section>
+</main>
+<script src="/static/js/common.js"></script>
+<script src="/static/js/hospital.js"></script>
+</body>
+</html>

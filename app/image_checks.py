@@ -93,6 +93,8 @@ def lesion_descriptors(rgb):
         return {"segmentation_ok": False}
     contour = max(cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)[0],
                   key=cv2.contourArea)
+    # light polygon smoothing so pixel "staircase" edges do not count as irregularity
+    contour = cv2.approxPolyDP(contour, 0.004 * cv2.arcLength(contour, True), True)
     area, perimeter = cv2.contourArea(contour), cv2.arcLength(contour, True)
     pixels = img[mask > 0].astype(np.float32)
     refs = np.array(list(REFERENCE_COLOURS.values()), dtype=np.float32)

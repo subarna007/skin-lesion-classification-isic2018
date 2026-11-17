@@ -3,122 +3,145 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DermAssist · skin lesion triage prototype</title>
-<link rel="stylesheet" href="/static/style.css">
+<title>DermAssist · Skin lesion classification on ISIC 2018</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/site.css">
 </head>
 <body>
-<header class="topbar">
-  <div class="brand"><span class="logo">D</span> DermAssist</div>
-  <nav>
-    <a href="#analyse">Analyse</a>
-    <a href="#workflow">Hospital workflow</a>
-    <a href="#model">About the model</a>
-  </nav>
-  <span class="badge">Research prototype · not a medical device</span>
-</header>
-
 <main>
-<section class="hero">
-  <h1>AI-assisted triage of dermoscopic images</h1>
-  <p>Upload a dermoscopic image of a skin lesion. The model estimates the probability of seven
-     diagnoses from the ISIC 2018 challenge, shows where it looked, and suggests whether the case
-     should be referred to a dermatologist. It supports, and never replaces, clinical judgement.</p>
-  <div id="model-status" class="status">Checking model…</div>
-</section>
-
-<section id="analyse" class="card">
-  <h2>1 · Analyse an image</h2>
-  <div class="upload-row">
-    <label id="drop" class="drop">
-      <input id="file" type="file" accept="image/*" hidden>
-      <img id="preview" alt="" hidden>
-      <span id="drop-text">Drop a dermoscopic image here or <u>choose a file</u><br>
-        <small>JPEG or PNG, up to 15 MB</small></span>
-    </label>
-    <div class="upload-side">
-      <p class="hint">The model was trained only on dermoscopic images (taken through a dermatoscope).
-        Ordinary phone photos, other body parts or non-skin images will still produce an answer,
-        and that answer is meaningless.</p>
-      <button id="analyse-btn" disabled>Analyse image</button>
-      <div id="error" class="error" hidden></div>
-    </div>
-  </div>
-</section>
-
-<section id="result" class="card" hidden>
-  <h2>2 · Result</h2>
-  <div id="triage" class="triage"></div>
-  <div class="result-grid">
+  <section class="hero">
     <div>
-      <div class="tabs">
-        <button class="tab active" data-img="gradcam">Grad-CAM</button>
-        <button class="tab" data-img="original">Original</button>
-        <button class="tab" data-img="outline">Lesion outline</button>
+      <h1>Seven-class skin lesion classification, tested on lesions the model has never seen</h1>
+      <p class="lede">A ConvNeXt-Tiny classifier for dermoscopic images, trained on HAM10000 (ISIC 2018 Task 3)
+        with a lesion-grouped split, class-balanced sampling and a melanoma screening threshold chosen before
+        the test set was opened. DermAssist wraps the model in a triage tool for a district hospital setting.</p>
+      <div class="btn-row">
+        <a class="btn primary" href="/analyse">Analyse an image</a>
+        <a class="btn" href="https://github.com/subarna007/skin-lesion-classification-isic2018">
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.2-3.1-.1-.4-.5-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.7 1.6.2 2.8.1 3.2.8.8 1.2 1.9 1.2 3.1 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .5z"/></svg>
+          View the code</a>
       </div>
-      <img id="result-img" class="result-img" alt="analysed lesion">
-      <p class="caption" id="img-caption"></p>
+      <p class="byline">Subarna Dahal, MSc Information Technology (AI and ML). A follow-up to my capstone project
+        at Presidential Graduate School, affiliated to Westcliff University.</p>
     </div>
     <div>
-      <div class="prediction">
-        <div class="pred-label">Most likely</div>
-        <div class="pred-name" id="pred-name"></div>
-        <div><span id="pred-cat" class="pill"></span> <span id="pred-prob" class="muted"></span></div>
-        <p id="pred-desc" class="muted"></p>
+      <div class="scope" id="hero-scope">
+        <div class="lens">
+          <img src="/static/img/hero-original.jpg" alt="Dermoscopic image of a melanoma from the test set">
+          <img class="overlay" id="hero-overlay" src="/static/img/hero-gradcam.jpg" alt="" style="opacity:.55">
+        </div>
+        <svg class="reticle" viewBox="0 0 100 100" aria-hidden="true">
+          <g stroke="rgba(255,255,255,.55)" stroke-width=".35">
+            <line x1="50" y1="3" x2="50" y2="9"/><line x1="50" y1="91" x2="50" y2="97"/>
+            <line x1="3" y1="50" x2="9" y2="50"/><line x1="91" y1="50" x2="97" y2="50"/>
+          </g>
+        </svg>
       </div>
-      <h3>Probability of each class</h3>
-      <div id="bars" class="bars"></div>
-      <h3>Melanoma screening</h3>
-      <p id="mel-text"></p>
-      <div id="warnings"></div>
+      <div class="scope-controls">
+        <div class="slider-row">
+          <span>Image</span>
+          <input type="range" id="hero-slider" min="0" max="100" value="55" aria-label="Grad-CAM overlay strength">
+          <span>Grad-CAM</span>
+        </div>
+        <p class="scope-caption">A melanoma from the held-out test set, correctly classified. Drag to blend in the
+          Grad-CAM map: warmer regions raised the melanoma score the most.</p>
+      </div>
     </div>
-  </div>
-  <details class="descriptors">
-    <summary>Lesion shape and colour (experimental image measurements)</summary>
-    <div id="desc-body"></div>
-    <p class="muted small">Measured with classical image processing on the outlined region. These are not
-      part of the model's decision and are not clinically validated. Diameter and evolution (the D and E
-      of the ABCDE rule) are not shown: a single photo has no physical scale and no history.</p>
-  </details>
-  <div class="actions">
-    <button id="queue-btn">Add to referral queue</button>
-    <span class="muted small">Demonstrates the hospital workflow below. Stored only in this browser tab.</span>
-  </div>
-</section>
+  </section>
 
-<section id="workflow" class="card">
-  <h2>3 · Example hospital workflow</h2>
-  <p class="muted">Illustrative integration at a fictional facility, <b>Himalaya District Hospital</b>,
-    where a dermatologist visits only part of the week. Not a real deployment.</p>
-  <ol class="steps">
-    <li><b>Capture.</b> A health assistant takes a dermoscopic image at the outpatient clinic.</li>
-    <li><b>Triage.</b> DermAssist returns class probabilities, a Grad-CAM map and a refer / routine suggestion.</li>
-    <li><b>Queue.</b> Referred cases are listed for the visiting dermatologist, highest melanoma probability first.</li>
-    <li><b>Review.</b> The dermatologist examines the patient and decides on biopsy or follow-up. The AI output is advisory only.</li>
-  </ol>
-  <h3>Dermatologist review queue</h3>
-  <table class="queue">
-    <thead><tr><th>Case</th><th>Time</th><th>Most likely</th><th>P(melanoma)</th><th>Suggestion</th><th></th></tr></thead>
-    <tbody id="queue-body"><tr class="empty"><td colspan="6">No cases yet. Analyse an image and add it to the queue.</td></tr></tbody>
-  </table>
-</section>
+  <section class="band" id="results">
+    <h2>What the stricter pipeline changed</h2>
+    <p>Both models were trained and tested on exactly the same lesion-grouped split. The baseline reproduces the
+      capstone setup; the second model changes the architecture, input size and imbalance handling.</p>
+    <div class="two-col" style="margin-top:28px">
+      <div>
+        <svg class="ci-plot" id="ci-plot" role="img" aria-label="Test metrics with 95% confidence intervals"></svg>
+        <div class="legend" id="ci-legend"></div>
+        <p class="fine" style="margin-top:10px">Dots are test-set estimates; lines are 95% bootstrap intervals (1,000 resamples).</p>
+      </div>
+      <div id="results-text"></div>
+    </div>
+  </section>
 
-<section id="model" class="card">
-  <h2>4 · About the model</h2>
-  <div id="model-body" class="muted">Loading…</div>
-  <h3>Limitations</h3>
-  <ul class="limits">
-    <li>Trained and tested on one public dataset (HAM10000 / ISIC 2018), mostly from European clinics and lighter skin types. Performance on patients in Nepal is unknown.</li>
-    <li>Test results come from a held-out split of the same dataset, not from a prospective clinical study.</li>
-    <li>Rare classes (dermatofibroma, vascular lesions) have few test images, so their figures are uncertain.</li>
-    <li>Grad-CAM shows which regions influenced the output; it does not prove the reasoning is clinically correct.</li>
-  </ul>
-</section>
+  <section class="band">
+    <h2>Per-class results</h2>
+    <p>Sensitivity is the share of each class the model found. Rare classes have few test images, so their
+      figures move a lot with a handful of cases.</p>
+    <div style="overflow-x:auto;margin-top:22px"><table class="data" id="class-table"></table></div>
+  </section>
+
+  <section class="band">
+    <h2>Where the model is right and wrong</h2>
+    <div class="two-col" style="margin-top:28px">
+      <figure>
+        <img src="/results/convnext_balanced_confusion.png" alt="Confusion matrix of the ConvNeXt model on the test set">
+        <figcaption>Confusion matrix of the ConvNeXt model on the test set, normalised by row. The most common
+          error is nevi predicted as melanoma, the price of a high melanoma sensitivity.</figcaption>
+      </figure>
+      <figure>
+        <img src="/results/fig_per_class_sensitivity.png" alt="Per-class sensitivity of both models">
+        <figcaption>Per-class sensitivity of both models. ConvNeXt improves most on melanoma, benign keratosis
+          and basal cell carcinoma; actinic keratosis remains the weakest class.</figcaption>
+      </figure>
+    </div>
+    <figure style="margin-top:40px">
+      <img src="/results/convnext_balanced_gradcam.jpg" alt="Grad-CAM maps for two test images per class">
+      <figcaption>Grad-CAM for the predicted class on two test images per class. Titles in red are errors.
+        Most maps sit on the lesion itself rather than on rulers, hair or the dark vignette of the dermatoscope.</figcaption>
+    </figure>
+  </section>
+
+  <section class="band">
+    <h2>Method</h2>
+    <ol class="steps">
+      <li><h3>Data</h3><p>10,015 dermoscopic images in seven classes from HAM10000, the ISIC 2018 Task 3 training set.</p></li>
+      <li><h3>Lesion-grouped split</h3><p>Images of the same lesion stay together: about 70% train, 15% validation and 15% test, stratified by class.</p></li>
+      <li><h3>Training</h3><p>ImageNet-pretrained ConvNeXt-Tiny at 384 px, class-balanced sampling, rotation, crop and colour augmentation, AdamW with cosine decay.</p></li>
+      <li><h3>Model selection</h3><p>The epoch with the best validation balanced accuracy is kept, the official ISIC 2018 metric.</p></li>
+      <li><h3>Screening threshold</h3><p>A cut-off on the melanoma probability is fixed on validation data for 90% sensitivity, then applied unchanged to the test set.</p></li>
+      <li><h3>Evaluation and explanation</h3><p>The test set is predicted once, with flip averaging. Metrics get bootstrap intervals, and Grad-CAM is computed for the predicted class.</p></li>
+    </ol>
+    <div class="two-col" style="margin-top:48px">
+      <div>
+        <h3 style="margin-bottom:10px">Validation curve</h3>
+        <svg class="ci-plot" id="history-plot" role="img" aria-label="Validation balanced accuracy per epoch"></svg>
+        <div class="legend" id="history-legend"></div>
+      </div>
+      <div>
+        <h3 style="margin-bottom:10px">Reading the curve</h3>
+        <p class="muted" id="history-text"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="two-col">
+      <div>
+        <h2 style="margin-bottom:16px">Limitations</h2>
+        <ul class="limits">
+          <li>One public dataset, mostly from European clinics and lighter skin types. Performance on patients in Nepal is unknown and needs local validation.</li>
+          <li>The test set is a held-out split of the same dataset, not an external or prospective clinical study.</li>
+          <li>Dermatofibroma and vascular lesions have only 24 and 15 test images, so their figures are uncertain.</li>
+          <li>The validation curve peaks early and is noisy, so a different seed could select a different epoch. Results come from a single run.</li>
+          <li>Grad-CAM shows which regions influenced the score; it does not prove the reasoning is clinically valid.</li>
+        </ul>
+      </div>
+      <div>
+        <h2 style="margin-bottom:16px">References</h2>
+        <ol class="refs">
+          <li>Codella N. et al. Skin lesion analysis toward melanoma detection 2018: a challenge hosted by the International Skin Imaging Collaboration (ISIC). arXiv:1902.03368, 2019.</li>
+          <li>Tschandl P., Rosendahl C., Kittler H. The HAM10000 dataset, a large collection of multi-source dermatoscopic images of common pigmented skin lesions. Scientific Data 5, 180161, 2018.</li>
+          <li>Liu Z. et al. A ConvNet for the 2020s. CVPR, 2022.</li>
+          <li>He K. et al. Deep residual learning for image recognition. CVPR, 2016.</li>
+          <li>Selvaraju R. R. et al. Grad-CAM: visual explanations from deep networks via gradient-based localization. ICCV, 2017.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
 </main>
-
-<footer>
-  DermAssist is a student research prototype for demonstration. It is not a medical device and must not be used
-  for diagnosis. Data: ISIC 2018 Task 3 / HAM10000 (Codella et al., 2019; Tschandl et al., 2018).
-</footer>
-<script src="/static/app.js"></script>
+<script src="/static/js/common.js"></script>
+<script src="/static/js/research.js"></script>
 </body>
 </html>
