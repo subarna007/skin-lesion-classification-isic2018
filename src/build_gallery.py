@@ -55,8 +55,8 @@ def main():
 
     df = pd.read_csv(os.path.join(args.results_dir, "splits.csv"))
     train = df[df["split"] == "train"].drop_duplicates("lesion_id")       # one image per lesion
-    sample = (train.groupby("label", group_keys=False)
-              .apply(lambda g: g.sample(min(len(g), args.per_class), random_state=args.seed)))
+    sample = pd.concat([g.sample(min(len(g), args.per_class), random_state=args.seed)
+                        for _, g in train.groupby("label")])
 
     os.makedirs(os.path.join(args.out_dir, "thumbs"), exist_ok=True)
     embs, labels, images = [], [], []
