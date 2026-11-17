@@ -115,7 +115,8 @@ def main():
     ax.set_yticks(range(len(CLASSES)), CLASSES)
     ax.set_xlabel("Predicted")
     ax.set_ylabel("True")
-    ax.set_title(f"{args.name}: row-normalised confusion matrix (test)", fontsize=10)
+    nice = {"baseline_resnet50": "ResNet-50 baseline", "convnext_balanced": "ConvNeXt-Tiny"}.get(args.name, args.name)
+    ax.set_title(f"{nice}: confusion matrix on the test set (colour = row share)", fontsize=10)
     for i in range(len(CLASSES)):
         for j in range(len(CLASSES)):
             ax.text(j, i, f"{cm[i, j]}", ha="center", va="center", fontsize=8,

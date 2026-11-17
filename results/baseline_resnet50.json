@@ -1,0 +1,217 @@
+{
+  "name": "baseline_resnet50",
+  "protocol": "B: internal held-out test split; grouped by lesion",
+  "n_test": 1508,
+  "config": {
+    "name": "baseline_resnet50",
+    "arch": "resnet50",
+    "img_size": 224,
+    "epochs": 20,
+    "batch_size": 32,
+    "lr": 0.0001,
+    "weight_decay": 0.0001,
+    "loss": "weighted_ce",
+    "label_smoothing": 0.0,
+    "sampler": "none",
+    "aug": "basic",
+    "no_tta": true,
+    "workers": 4,
+    "data_dir": "data",
+    "out_dir": "results",
+    "ckpt_dir": "checkpoints",
+    "seed": 42
+  },
+  "train_minutes": 14.7,
+  "best_val_balanced_acc": 0.7713317852583282,
+  "test": {
+    "accuracy": 0.746684350132626,
+    "balanced_accuracy": 0.7128119432854305,
+    "macro_f1": 0.6088278308898726,
+    "melanoma_sensitivity": 0.6217948717948718,
+    "macro_auc": 0.9317091543689247
+  },
+  "test_ci95": {
+    "accuracy": [
+      0.7241213527851459,
+      0.7685676392572944
+    ],
+    "balanced_accuracy": [
+      0.6643879362587338,
+      0.7564602506082619
+    ],
+    "macro_f1": [
+      0.5606493314545955,
+      0.6484983181412463
+    ],
+    "melanoma_sensitivity": [
+      0.5460376794258373,
+      0.6918196347031963
+    ],
+    "macro_auc": [
+      0.9185424343422578,
+      0.9437785131700374
+    ]
+  },
+  "per_class": {
+    "MEL": {
+      "support": 156,
+      "sensitivity": 0.6217948717948718,
+      "specificity": 0.9023668639053254,
+      "precision": 0.42358078602620086,
+      "f1": 0.5038961038961038,
+      "auc": 0.8685518130784403,
+      "average_precision": 0.5194456576209048
+    },
+    "NV": {
+      "support": 1011,
+      "sensitivity": 0.7922848664688428,
+      "specificity": 0.9134808853118712,
+      "precision": 0.9490521327014217,
+      "f1": 0.8636118598382749,
+      "auc": 0.9449476284014673,
+      "average_precision": 0.971274548034508
+    },
+    "BCC": {
+      "support": 72,
+      "sensitivity": 0.8194444444444444,
+      "specificity": 0.9644846796657381,
+      "precision": 0.5363636363636364,
+      "f1": 0.6483516483516484,
+      "auc": 0.9683534509439802,
+      "average_precision": 0.6889917564822358
+    },
+    "AKIEC": {
+      "support": 46,
+      "sensitivity": 0.7608695652173914,
+      "specificity": 0.9610123119015048,
+      "precision": 0.3804347826086957,
+      "f1": 0.5072463768115942,
+      "auc": 0.9531315053827396,
+      "average_precision": 0.5594429539432638
+    },
+    "BKL": {
+      "support": 184,
+      "sensitivity": 0.5869565217391305,
+      "specificity": 0.9478851963746223,
+      "precision": 0.6101694915254238,
+      "f1": 0.5983379501385041,
+      "auc": 0.8691218967555497,
+      "average_precision": 0.6019895546323479
+    },
+    "DF": {
+      "support": 24,
+      "sensitivity": 0.5416666666666666,
+      "specificity": 0.9865229110512129,
+      "precision": 0.3939393939393939,
+      "f1": 0.45614035087719296,
+      "auc": 0.9262971698113208,
+      "average_precision": 0.5536370987991575
+    },
+    "VASC": {
+      "support": 15,
+      "sensitivity": 0.8666666666666667,
+      "specificity": 0.9933020763563295,
+      "precision": 0.5652173913043478,
+      "f1": 0.6842105263157895,
+      "auc": 0.9915606162089753,
+      "average_precision": 0.8933555497091409
+    }
+  },
+  "confusion_matrix": [
+    [
+      97,
+      21,
+      10,
+      12,
+      11,
+      2,
+      3
+    ],
+    [
+      109,
+      801,
+      19,
+      11,
+      52,
+      12,
+      7
+    ],
+    [
+      0,
+      2,
+      59,
+      6,
+      4,
+      1,
+      0
+    ],
+    [
+      3,
+      1,
+      4,
+      35,
+      2,
+      1,
+      0
+    ],
+    [
+      20,
+      16,
+      14,
+      22,
+      108,
+      4,
+      0
+    ],
+    [
+      0,
+      1,
+      4,
+      6,
+      0,
+      13,
+      0
+    ],
+    [
+      0,
+      2,
+      0,
+      0,
+      0,
+      0,
+      13
+    ]
+  ],
+  "mean_average_precision": 0.6840195884602227,
+  "melanoma_operating_point": {
+    "target_validation_sensitivity": 0.9,
+    "threshold": 0.06678886711597443,
+    "validation": {
+      "sensitivity": 0.9047619047619048,
+      "specificity": 0.5946745562130178
+    },
+    "test": {
+      "sensitivity": 0.9102564102564102,
+      "specificity": 0.636094674556213
+    },
+    "test_ci95": {
+      "sensitivity": [
+        0.8636363636363636,
+        0.9517405582922824
+      ],
+      "specificity": [
+        0.6118441120871422,
+        0.663753260525197
+      ]
+    },
+    "test_auc": 0.8685518130784403
+  },
+  "malignant_vs_benign": {
+    "threshold": 0.2867262661457062,
+    "test_auc": 0.9064758840161365,
+    "test": {
+      "sensitivity": 0.9087591240875912,
+      "specificity": 0.7325769854132901
+    }
+  }
+}

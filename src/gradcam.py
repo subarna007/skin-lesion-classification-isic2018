@@ -68,7 +68,7 @@ def main():
     for ax in axes.ravel():
         ax.axis("off")
     fig.tight_layout()
-    fig.savefig(os.path.join(args.out_dir, f"{args.name}_gradcam.png"), dpi=150)
+    fig.savefig(os.path.join(args.out_dir, f"{args.name}_gradcam.jpg"), dpi=150, pil_kwargs={"quality": 85})
     print("saved Grad-CAM grid")
 
 

@@ -14,7 +14,8 @@ import numpy as np
 from splits import CLASSES
 
 START, END = "<!-- RESULTS:START -->", "<!-- RESULTS:END -->"
-COLORS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100"]
+COLORS = ["#9aa7b1", "#0e6b66", "#2a78d6", "#eda100"]
+NICE = {"baseline_resnet50": "ResNet-50 baseline", "convnext_balanced": "ConvNeXt-Tiny"}
 
 
 def ci(r, key):
@@ -41,16 +42,16 @@ def main():
              "|---|---|---|---|---|---|---|"]
     for r in recs:
         c = r["config"]
-        lines.append(f"| {r['name']} ({c['arch']}, {c['img_size']}px) | {ci(r, 'accuracy')} | "
+        lines.append(f"| {NICE.get(r['name'], r['name'])} ({c['img_size']} px) | {ci(r, 'accuracy')} | "
                      f"{ci(r, 'balanced_accuracy')} | {r['test']['macro_f1']:.3f} | {ci(r, 'macro_auc')} | "
                      f"{ci(r, 'melanoma_sensitivity')} | {r['per_class']['DF']['sensitivity']:.3f} |")
-    lines += ["", f"Test set: {recs[0]['n_test']} images ({recs[0]['protocol']}). "
+    lines += ["", f"Test set: {recs[0]['n_test']:,} images, a held-out split grouped by lesion. "
                   "Brackets are 95% bootstrap intervals (1,000 resamples).", "",
               "Melanoma screening view (flag when P(MEL) is above a threshold fixed on the validation set):", "",
               "| Model | Threshold | Test sensitivity | Test specificity | Melanoma AUC |", "|---|---|---|---|---|"]
     for r in recs:
         m = r["melanoma_operating_point"]
-        lines.append(f"| {r['name']} | {m['threshold']:.3f} | {m['test']['sensitivity']:.3f} "
+        lines.append(f"| {NICE.get(r['name'], r['name'])} | {m['threshold']:.3f} | {m['test']['sensitivity']:.3f} "
                      f"({m['test_ci95']['sensitivity'][0]:.3f}-{m['test_ci95']['sensitivity'][1]:.3f}) | "
                      f"{m['test']['specificity']:.3f} | {m['test_auc']:.3f} |")
     table = "\n".join(lines)
@@ -69,7 +70,7 @@ def main():
     x, width = np.arange(len(CLASSES)), 0.8 / len(recs)
     for i, r in enumerate(recs):
         vals = [r["per_class"][c]["sensitivity"] for c in CLASSES]
-        ax.bar(x + (i - (len(recs) - 1) / 2) * width, vals, width * 0.92, label=r["name"],
+        ax.bar(x + (i - (len(recs) - 1) / 2) * width, vals, width * 0.92, label=NICE.get(r["name"], r["name"]),
                color=COLORS[i % len(COLORS)])
     ax.set_xticks(x, CLASSES)
     ax.set_ylim(0, 1)
@@ -79,8 +80,8 @@ def main():
     for side in ("top", "right", "left"):
         ax.spines[side].set_visible(False)
     ax.tick_params(length=0)
-    ax.set_title("Per-class sensitivity", loc="left", fontsize=12, fontweight="bold")
-    ax.legend(frameon=False, ncol=len(recs), loc="upper right", fontsize=9)
+    ax.set_title("Per-class sensitivity on the test set", loc="left", fontsize=12, fontweight="bold")
+    ax.legend(frameon=False, ncol=len(recs), loc="upper center", bbox_to_anchor=(0.5, -0.08), fontsize=9)
     fig.tight_layout()
     fig.savefig(os.path.join(args.results_dir, "fig_per_class_sensitivity.png"), dpi=200)
     plt.close(fig)
