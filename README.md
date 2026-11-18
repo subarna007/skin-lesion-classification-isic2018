@@ -2,6 +2,8 @@
 
 Seven-class classification of dermoscopic images (melanoma, nevus, basal cell carcinoma, actinic keratosis, benign keratosis, dermatofibroma, vascular lesion) on the ISIC 2018 Task 3 / HAM10000 dataset, with a web application (DermAssist) that turns the model into a triage tool.
 
+**Paper:** [Lesion-grouped evaluation of deep learning for seven-class dermoscopic skin lesion classification (PDF)](paper/Dahal_2026_skin_lesion_classification.pdf), also on [my website](https://subarna007.github.io/personalwebsite/#skin).
+
 This repository is a follow-up to my MSc capstone project. The capstone model (ResNet-50 with class-weighted loss) reached 76.7% accuracy but detected only 36% of melanomas and none of the dermatofibromas, and it was evaluated on the same image-level split that was used for model selection. Here I rebuilt the pipeline with a stricter evaluation and measured how much of that weakness can be fixed.
 
 ## What is different from the capstone
