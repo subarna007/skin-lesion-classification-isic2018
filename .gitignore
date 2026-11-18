@@ -10,3 +10,9 @@ checkpoints/*
 !checkpoints/*.sha256
 app/data/
 .DS_Store
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.fls
+paper/*.fdb_latexmk
+paper/paper.pdf
